@@ -11,15 +11,28 @@ mongoose.connect('mongodb://mongo:27017/mydatabase', { useNewUrlParser: true, us
 // Define a simple Mongoose model
 const Item = mongoose.model('Item', { name: String });
 
-// Set up a default item in the database
-const defaultItem = new Item({ name: 'Welcome in node-mongodb' });
-defaultItem.save();
-
-// Root route to insert the default item into the database
 app.get('/', async (req, res) => {
   try {
-    // Create a new item with the default value
-    const newItem = new Item({ name: 'Welcome in node-mongodb' });
+    // Query the database for a specific item
+    const item = await Item.findOne({ name: 'Welcome Here' });
+
+    // If the item is found, send its content as the response
+    if (item) {
+      res.send(item.name);
+    } else {
+      res.send('Item not found in the database!');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Route to insert data into the database
+app.get('/insert', async (req, res) => {
+  try {
+    // Create a new item
+    const newItem = new Item({ name: 'Welcome Here' });
 
     // Save the item to the database
     await newItem.save();
